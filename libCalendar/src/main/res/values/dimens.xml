@@ -1,0 +1,5 @@
+<resources>
+
+    <dimen name="libcalendar_calendar_view_padding_bottom">12dp</dimen>
+
+</resources>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/activity_main"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_main"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <LinearLayout
@@ -12,7 +12,7 @@
         android:layout_height="48dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        >
+        android:background="@color/light_theme_color">
 
         <ImageView
             android:id="@+id/back"
@@ -29,21 +29,19 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="2016/10/10"
-            android:textColor="#ffffff"
+            android:textColor="@color/white"
             />
 
         <View
             android:layout_width="48dp"
-            android:layout_height="0dp"
-            />
+            android:layout_height="0dp"/>
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="28dp"
-        android:orientation="horizontal"
-        >
+        android:layout_height="40dp"
+        android:orientation="horizontal">
 
         <TextView
             android:layout_width="0dp"
@@ -51,7 +49,8 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="日"
-            android:textColor="#ffffff"
+            android:textSize="@dimen/text_size_12"
+            android:textColor="@color/main_color"
             />
 
         <TextView
@@ -60,7 +59,8 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="一"
-            android:textColor="#ffffff"
+            android:textSize="@dimen/text_size_12"
+            android:textColor="@color/main_color"
             />
 
         <TextView
@@ -69,7 +69,8 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="二"
-            android:textColor="#ffffff"
+            android:textSize="@dimen/text_size_12"
+            android:textColor="@color/main_color"
             />
 
         <TextView
@@ -78,7 +79,8 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="三"
-            android:textColor="#ffffff"
+            android:textSize="@dimen/text_size_12"
+            android:textColor="@color/main_color"
             />
 
         <TextView
@@ -87,7 +89,8 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="四"
-            android:textColor="#ffffff"
+            android:textSize="@dimen/text_size_12"
+            android:textColor="@color/main_color"
             />
 
         <TextView
@@ -96,7 +99,8 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="五"
-            android:textColor="#ffffff"
+            android:textSize="@dimen/text_size_12"
+            android:textColor="@color/main_color"
             />
 
         <TextView
@@ -105,30 +109,35 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="六"
-            android:textColor="#ffffff"
+            android:textSize="@dimen/text_size_12"
+            android:textColor="@color/main_color"
             />
 
     </LinearLayout>
 
 
-
     <com.test.calendar.CalendarLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        >
+        android:layout_weight="1">
 
         <com.test.calendar.CalendarDateView
             android:id="@+id/calendarDateView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <ListView
-            android:id="@+id/list"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#ffffff"
-            />
+            android:background="@color/background_color"/>
+
+        <!--<ListView-->
+            <!--android:id="@+id/list"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="#ffffff"-->
+            <!--/>-->
 
     </com.test.calendar.CalendarLayout>
 

@@ -1,15 +1,35 @@
 package com.test.calendar;
 
-
 public class CalendarBean {
+
+    /**
+     * BEFORE  42格当月之前的日期
+     * CURRENT 42当月日期
+     * AFTER   42格当月之后的日期
+     */
+    public enum MONTH_FLAG {
+        BEFORE, CURRENT, AFTER
+    }
+
+    /**
+     * BACKUP  在组里面但是没有自己的任务
+     * WORK    在组里面同时有自己的任务
+     * REST    当天没有任务
+     */
+    public enum DAY_FLAG {
+        BACKUP, WORK, REST
+    }
 
     public int year;
     public int moth;
     public int day;
     public int week;
 
-    //-1,0,1
-    public int mothFlag;
+    public boolean isToday;
+
+    public MONTH_FLAG monthFlag = MONTH_FLAG.CURRENT;
+
+    public DAY_FLAG dayFlag = DAY_FLAG.REST;
 
     //显示
     public String chinaMonth;
@@ -21,39 +41,8 @@ public class CalendarBean {
         this.day = day;
     }
 
-    public String getDisplayWeek(){
-        String s="";
-         switch(week){
-             case 1:
-                 s="星期日";
-          break;
-             case 2:
-                 s="星期一";
-          break;
-             case 3:
-                 s="星期二";
-                 break;
-             case 4:
-                 s="星期三";
-                 break;
-             case 5:
-                 s="星期四";
-                 break;
-             case 6:
-                 s="星期五";
-                 break;
-             case 7:
-                 s="星期六";
-                 break;
-
-         }
-        return s ;
+    public String getDisplayDay() {
+        return "" + day;
     }
 
-    @Override
-    public String toString() {
-//        String s=year+"/"+moth+"/"+day+"\t"+getDisplayWeek()+"\t农历"+":"+chinaMonth+"/"+chinaDay;
-        String s=year+"/"+moth+"/"+day;
-        return s;
-    }
 }

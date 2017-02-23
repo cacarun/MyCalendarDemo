@@ -5,8 +5,8 @@ import android.graphics.Rect;
 import android.support.v4.view.VelocityTrackerCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ScrollerCompat;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -17,16 +17,12 @@ import android.widget.AbsListView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
-/**
- * Created by codbking on 2016/12/18.
- * email:codbking@gmail.com
- * github:https://github.com/codbking
- * blog:http://www.jianshu.com/users/49d47538a2dd/latest_articles
- */
-
 public class CalendarLayout extends FrameLayout {
 
     private static final String TAG = "CalendarLayout";
+
+    private static final int INDEX_VIEW1 = 0;
+    private static final int INDEX_VIEW2 = 1;
 
     private View view1;
     private ViewGroup view2;
@@ -38,9 +34,9 @@ public class CalendarLayout extends FrameLayout {
     public int type = TYPE_FOLD;
 
     //是否处于滑动中
-    private boolean isSilde = false;
+    private boolean isSlide = false;
 
-    private int topHeigth;
+    private int topHeight;
     private int itemHeight;
     private int bottomViewTopHeight;
     private int maxDistance;
@@ -48,7 +44,7 @@ public class CalendarLayout extends FrameLayout {
     private ScrollerCompat mScroller;
     private float mMaxVelocity;
     private float mMinVelocity;
-    private int activitPotionerId;
+    private int activePointerId;
 
     private static final Interpolator sInterpolator = new Interpolator() {
         @Override
@@ -72,13 +68,13 @@ public class CalendarLayout extends FrameLayout {
     protected void onFinishInflate() { // 当View及其子View从XML文件中加载完成后会被调用
         super.onFinishInflate();
 
-        final CalendarTopView viewPager = (CalendarTopView) getChildAt(0);
+        final CalendarTopView viewPager = (CalendarTopView) getChildAt(INDEX_VIEW1);
 
         mTopView = viewPager;
         view1 = (View) viewPager;
-        view2 = (ViewGroup) getChildAt(1);
+        view2 = (ViewGroup) getChildAt(INDEX_VIEW2);
 
-        mTopView.setCaledarTopViewChangeListener(new CaledarTopViewChangeListener() {
+        mTopView.setCalendarTopViewChangeListener(new CalendarTopViewChangeListener() {
             @Override
             public void onLayoutChange(CalendarTopView topView) {
                 CalendarLayout.this.requestLayout();
@@ -90,28 +86,29 @@ public class CalendarLayout extends FrameLayout {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        itemHeight=mTopView.getItemHeight(); // 日历一行高度
-        topHeigth=view1.getMeasuredHeight(); // 日历当前总高度
+        itemHeight = mTopView.getItemHeight(); // 日历一行高度
+        topHeight = view1.getMeasuredHeight(); // 日历当前总高度
 
-        maxDistance = topHeigth - itemHeight;
+        maxDistance = topHeight - itemHeight;
 
         switch (type) {
             case TYPE_FOLD:
                 bottomViewTopHeight = itemHeight;
                 break;
             case TYPE_OPEN:
-                bottomViewTopHeight = topHeigth;
+                bottomViewTopHeight = topHeight;
                 break;
         }
-        view2.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(heightMeasureSpec) - mTopView.getItemHeight(), MeasureSpec.EXACTLY));
     }
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        view2.offsetTopAndBottom(bottomViewTopHeight); // 定位到一行的位置
-        int [] selectRct=getSelectRect();
-        if(type==TYPE_FOLD){
+
+        view2.offsetTopAndBottom(bottomViewTopHeight);
+
+        if (type == TYPE_FOLD) {
+            int[] selectRct = getSelectRect(); // 得到当前选中的日期的位置
             view1.offsetTopAndBottom(-selectRct[1]); // 定位到当前选中天的位置
         }
     }
@@ -126,52 +123,51 @@ public class CalendarLayout extends FrameLayout {
     }
 
     float oy, ox;
-    boolean isClickBtottomView = false;
+    boolean isClickBottomView = false;
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-//        mViewDragHelper.shouldInterceptTouchEvent(ev);
-        boolean isflag = false;
+        boolean isFlag = false;
 
         //上下运动进行拦截
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 oy = ev.getY();
                 ox = ev.getX();
-                isClickBtottomView = isClickView(view2, ev);
+
+                isClickBottomView = isClickView(view2, ev);
 
                 cancel();
 
-                activitPotionerId = ev.getPointerId(0); // 活跃的触点
+                activePointerId = ev.getPointerId(0); // 活跃的触点
 
                 int top = view2.getTop();
 
-                if (top < topHeigth) {
+                if (top < topHeight) {
                     type = TYPE_FOLD;
                 } else {
                     type = TYPE_OPEN;
                 }
+
                 break;
             case MotionEvent.ACTION_MOVE:
                 float y = ev.getY();
                 float x = ev.getX();
 
-                float xdiff = x - ox;
-                float ydiff = y - oy;
+                float xDiff = x - ox;
+                float yDiff = y - oy;
+                if (Math.abs(yDiff) > 5 && Math.abs(yDiff) > Math.abs(xDiff)) { // 有效的上下滑动
 
-                if (Math.abs(ydiff) > 5 && Math.abs(ydiff) > Math.abs(xdiff)) { // 有效的上下滑动
-                    isflag = true;
-
-                    if (isClickBtottomView) {
+                    isFlag = true;
+                    if (isClickBottomView) {
                         boolean isScroll = isScroll(view2);
-                        if (ydiff > 0) {
+
+                        if (yDiff > 0) {
                             //向下
                             if (type == TYPE_OPEN) {
-                                Log.d(TAG, "TYPE_OPEN打开状态    向下滑动");
                                 return super.onInterceptTouchEvent(ev);
                             } else {
                                 if (isScroll) {
-                                    Log.d(TAG, "TYPE_FOLD关闭    滑动");
                                     return super.onInterceptTouchEvent(ev);
                                 }
 
@@ -179,11 +175,9 @@ public class CalendarLayout extends FrameLayout {
                         } else {
                             //向上
                             if (type == TYPE_FOLD) {
-                                Log.d(TAG, "TYPE_FOLD关闭    向上滑动");
                                 return super.onInterceptTouchEvent(ev);
                             } else {
                                 if (isScroll) {
-                                    Log.d(TAG, "TYPE_OPEN打开状态    滑动");
                                     return super.onInterceptTouchEvent(ev);
                                 }
                             }
@@ -199,15 +193,12 @@ public class CalendarLayout extends FrameLayout {
                 break;
         }
 
-        boolean status = isSilde || isflag || super.onInterceptTouchEvent(ev);
-        Log.d(TAG, "其他 是否拦截：" + status);
-
-//        return isSilde || isflag || super.onInterceptTouchEvent(ev);
-        return status;
+        return isSlide || isFlag || super.onInterceptTouchEvent(ev);
     }
 
+    // 判断列表是否正在滑动中，支持 ListView 和 RecyclerView
     private boolean isScroll(ViewGroup view2) {
-        View fistChildView = view2.getChildAt(0);
+        View fistChildView = view2.getChildAt(INDEX_VIEW1);
         if (fistChildView == null) {
             return false;
         }
@@ -221,6 +212,15 @@ public class CalendarLayout extends FrameLayout {
                     return true;
                 }
             }
+        } else if (view2 instanceof RecyclerView) {
+            RecyclerView recyclerView = (RecyclerView) view2;
+            if (fistChildView.getTop() != 0) {
+                return true;
+            } else {
+                if (recyclerView.getChildAdapterPosition(fistChildView) != 0) {
+                    return true;
+                }
+            }
         }
 
         return false;
@@ -230,9 +230,7 @@ public class CalendarLayout extends FrameLayout {
     public boolean isClickView(View view, MotionEvent ev) {
         Rect rect = new Rect();
         view.getHitRect(rect);
-        boolean isClick = rect.contains((int) ev.getX(), (int) ev.getY());
-//        Log.d(TAG, "isClickView() called with: isClick = [" + isClick + "]");
-        return isClick;
+        return rect.contains((int) ev.getX(), (int) ev.getY());
     }
 
 
@@ -256,7 +254,7 @@ public class CalendarLayout extends FrameLayout {
             case MotionEvent.ACTION_DOWN:
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (isSilde) {
+                if (isSlide) {
                     return;
                 }
                 float cy = event.getY();
@@ -271,18 +269,18 @@ public class CalendarLayout extends FrameLayout {
                 break;
             case MotionEvent.ACTION_UP:
 
-                if (isSilde) {
+                if (isSlide) {
                     cancel();
                     return;
                 }
 
                 //判断速度
-                final int pointerId = activitPotionerId;
+                final int pointerId = activePointerId;
                 mVelocityTracker.computeCurrentVelocity(1000, mMaxVelocity);
-                float crrentV = VelocityTrackerCompat.getYVelocity(mVelocityTracker, pointerId);
+                float currentV = VelocityTrackerCompat.getYVelocity(mVelocityTracker, pointerId);
 
-                if (Math.abs(crrentV) > 2000) {
-                    if (crrentV > 0) {
+                if (Math.abs(currentV) > 2000) {
+                    if (currentV > 0) {
                         open();
                     } else {
                         flod();
@@ -291,11 +289,11 @@ public class CalendarLayout extends FrameLayout {
                     return;
                 }
 
-                int top = view2.getTop() - topHeigth;
-                int maxd = maxDistance;
+                int top = view2.getTop() - topHeight;
+                int maxD = maxDistance;
 
 
-                if (Math.abs(top) < maxd / 2) {
+                if (Math.abs(top) < maxD / 2) {
                     open();
                 } else {
                     flod();
@@ -310,24 +308,24 @@ public class CalendarLayout extends FrameLayout {
     }
 
     public void open() {
-        startScroll(view2.getTop(), topHeigth);
+        startScroll(view2.getTop(), topHeight);
     }
 
     public void flod() {
-        startScroll(view2.getTop(), topHeigth - maxDistance);
+        startScroll(view2.getTop(), topHeight - maxDistance);
     }
 
     private int[] getSelectRect() {
-        return mTopView.getCurrentSelectPositon();
+        return mTopView.getCurrentSelectPosition();
     }
 
     private void move(int dy) {
 
-        int []selectRect = getSelectRect();
-        int itemHeight=mTopView.getItemHeight();
+        int[] selectRect = getSelectRect();
+        int itemHeight = mTopView.getItemHeight();
 
         int dy1 = getAreaValue(view1.getTop(), dy, -selectRect[1], 0);
-        int dy2 = getAreaValue(view2.getTop() - topHeigth, dy, -(topHeigth - itemHeight), 0);
+        int dy2 = getAreaValue(view2.getTop() - topHeight, dy, -(topHeight - itemHeight), 0);
 
         if (dy1 != 0) {
             ViewCompat.offsetTopAndBottom(view1, dy1);
@@ -351,12 +349,12 @@ public class CalendarLayout extends FrameLayout {
         return dy;
     }
 
-    private void startScroll(int starty, int endY) {
+    private void startScroll(int startY, int endY) {
 
-        float distance = endY - starty;
+        float distance = endY - startY;
         float t = distance / maxDistance * 600;
 
-        mScroller.startScroll(0, 0, 0, endY - starty, (int) Math.abs(t));
+        mScroller.startScroll(0, 0, 0, endY - startY, (int) Math.abs(t));
         postInvalidate();
     }
 
@@ -368,7 +366,7 @@ public class CalendarLayout extends FrameLayout {
 
         bottomViewTopHeight = view2.getTop();
         if (mScroller.computeScrollOffset()) {
-            isSilde = true;
+            isSlide = true;
             int cy = mScroller.getCurrY();
             int dy = cy - oldY;
             move(dy);
@@ -376,8 +374,9 @@ public class CalendarLayout extends FrameLayout {
             postInvalidate();
         } else {
             oldY = 0;
-            isSilde = false;
+            isSlide = false;
         }
+
     }
 
     public void cancel() {

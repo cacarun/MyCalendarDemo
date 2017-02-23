@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:gravity="center_vertical"
-        android:text="日历"
+        android:text="日历点我"
         />
 
     <View

@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
-
 public class ChinaDate {
 
     private static SimpleDateFormat sdf = new SimpleDateFormat(

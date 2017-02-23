@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="cbd_calendar_row" format="integer"/>
 
-    <declare-styleable name="CalendarDateView">
-        <attr name="cbd_calendar_row"/>
+    <declare-styleable name="libcalendar_calendar_date_view">
+        <attr name="libcalendar_row" format="integer"/>
     </declare-styleable>
 
 </resources>

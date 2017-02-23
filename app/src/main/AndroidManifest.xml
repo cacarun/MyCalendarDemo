@@ -14,9 +14,7 @@
             >
         </activity>
         <activity
-            android:name="com.test.MainActivity"
-            android:theme="@style/AppTheme"
-            >
+            android:name="com.test.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
