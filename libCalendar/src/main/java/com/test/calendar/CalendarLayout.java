@@ -99,6 +99,10 @@ public class CalendarLayout extends FrameLayout {
                 bottomViewTopHeight = topHeight;
                 break;
         }
+
+        // 重设 list 高度（不然数据少的时候，日历会露出来）
+        view2.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(MeasureSpec
+                .getSize(heightMeasureSpec) - mTopView.getItemHeight(), MeasureSpec.EXACTLY));
     }
 
     @Override
